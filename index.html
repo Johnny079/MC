@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Visto de Turismo Americano - Trip Vistos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- html2pdf removed; using jsPDF for selectable-text PDF generation -->
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(circle at top left, rgba(255,255,255,0.2), transparent 20%),
+                        radial-gradient(circle at bottom right, rgba(255,255,255,0.14), transparent 18%),
+                        linear-gradient(135deg, #4f70d6 0%, #6f5bb7 45%, #2f3364 100%);
+            color: #1f2937;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.96);
+            padding: 36px;
+            border-radius: 28px;
+            border: 1px solid rgba(255,255,255,0.65);
+            box-shadow: 0 28px 80px rgba(15, 23, 42, 0.16);
+            max-width: 960px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .container:before {
+            content: '';
+            position: absolute;
+            inset: -40px 50%;
+            width: 260px;
+            height: 260px;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.22), transparent 60%);
+            filter: blur(28px);
+            pointer-events: none;
+        }
+        .container:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: -80px;
+            width: 240px;
+            height: 240px;
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.18), transparent 55%);
+            filter: blur(26px);
+            pointer-events: none;
+        }
+        .header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 32px;
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 1;
+            padding: 28px 32px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(248,250,255,0.88));
+            border-radius: 28px;
+            box-shadow: 0 28px 70px rgba(15, 23, 42, 0.12);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+        .header-left {
+            display: grid;
+            gap: 14px;
+        }
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 2.4rem;
+            color: #233d8a;
+            font-weight: 800;
+            margin-bottom: 0;
+        }
+        .logo-img {
+            height: 64px;
+            width: auto;
+            border-radius: 18px;
+            box-shadow: 0 14px 35px rgba(59, 75, 176, 0.18);
+        }
+        .header-title {
+            color: #0f172a;
+            font-size: clamp(2rem, 2.4vw, 2.8rem);
+            line-height: 1.05;
+            margin: 0;
+        }
+        .subtext {
+            color: #475569;
+            margin-top: 0;
+            font-size: 1rem;
+            max-width: 680px;
+            line-height: 1.7;
+        }
+        .header-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 12px 16px;
+            border-radius: 999px;
+            background: rgba(102, 126, 234, 0.12);
+            color: #334155;
+            font-size: 0.94rem;
+            font-weight: 700;
+            border: 1px solid rgba(99, 102, 241, 0.16);
+        }
+        .header-right {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .header-hero {
+            width: 140px;
+            height: 140px;
+            display: grid;
+            place-items: center;
+            border-radius: 32px;
+            background: radial-gradient(circle at top, rgba(79, 116, 233, 0.24), transparent 40%),
+                        linear-gradient(180deg, rgba(79, 116, 233, 0.14), rgba(255,255,255,0.75));
+            box-shadow: 0 20px 45px rgba(79, 116, 233, 0.18);
+            border: 1px solid rgba(79, 116, 233, 0.2);
+        }
+        .header-hero i {
+            font-size: 3.65rem;
+            color: #3c4bbb;
+        }
+        .header-subline {
+            margin-top: 8px;
+            padding: 16px 20px;
+            border-radius: 20px;
+            background: rgba(243, 244, 255, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
+            color: #475569;
+            font-size: 0.96rem;
+            line-height: 1.7;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #334155;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 16px;
+            background: #fbfdff;
+            font-size: 1rem;
+            color: #111827;
+            box-shadow: inset 0 1px 4px rgba(148, 163, 184, 0.12);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
+        }
+        .row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .col {
+            flex: 1;
+            min-width: 220px;
+        }
+        button {
+            background: linear-gradient(135deg, #5d7be2 0%, #4f61c9 100%);
+            color: white;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 18px 30px rgba(79, 116, 233, 0.24);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 22px 36px rgba(79, 116, 233, 0.28);
+        }
+        .travel-icon {
+            display: none;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        fieldset {
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            margin-bottom: 24px;
+            padding: 24px;
+            border-radius: 22px;
+            background: rgba(248, 250, 255, 0.92);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+            position: relative;
+        }
+        legend {
+            font-weight: 800;
+            color: #3b4bb0;
+            padding: 0 14px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card-icon {
+            font-size: 1.2em;
+            color: #667eea;
+        }
+        input[type="radio"], input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        input[type="radio"] + label,
+        input[type="checkbox"] + label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            background: rgba(99, 102, 241, 0.06);
+            color: #334155;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        input[type="radio"] + label:hover,
+        input[type="checkbox"] + label:hover {
+            background: rgba(99, 102, 241, 0.14);
+        }
+        input[type="radio"]:checked + label,
+        input[type="checkbox"]:checked + label {
+            background: linear-gradient(135deg, #667eea, #4f61c9);
+            color: #fff;
+            border-color: rgba(79, 116, 233, 0.45);
+            box-shadow: 0 10px 25px rgba(79, 116, 233, 0.18);
+        }
+        .form-group.radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group.radio-group label:first-child {
+            margin-bottom: 0;
+            margin-right: 0;
+            font-weight: 700;
+            color: #334155;
+        }
+        .form-group.checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(180px, 1fr));
+            gap: 10px;
+            align-items: start;
+        }
+        .form-group.checkbox-group input[type="checkbox"] + label {
+            margin-bottom: 0;
+        }
+        .visa-group {
+            display: grid;
+            grid-template-columns: 1.65fr 1fr;
+            gap: 22px;
+            align-items: flex-start;
+        }
+        .visa-field small {
+            display: block;
+            margin-top: 8px;
+            color: #64748b;
+            font-size: 0.92rem;
+        }
+        .visa-example {
+            padding: 16px;
+            border-radius: 18px;
+            background: #ffffff;
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            box-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
+        }
+        .visa-example img {
+            max-width: 100%;
+            border-radius: 14px;
+            display: block;
+            margin-bottom: 12px;
+        }
+        .visa-example p {
+            margin: 0;
+            color: #334155;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        .footer p {
+            margin: 5px 0;
+            color: #5b6d86;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            .row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .col {
+                min-width: unset;
+            }
+            .form-group.checkbox-group {
+                grid-template-columns: 1fr;
+            }
+            fieldset {
+                padding: 16px;
+            }
+            button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="pdfContent">
+            <div class="header">
+                <div class="header-left">
+                    <div class="logo">
+                        <img src="logo.png" alt="Trip Vistos Logo" class="logo-img">
+                        Trip Vistos
+                    </div>
+                    <h1 class="header-title">Formulário de Solicitação de Visto de Turismo Americano</h1>
+                    <p class="subtext">Seu visto americano de turismo com atendimento premium e personalizado.</p>
+                    <div class="header-badges">
+                        <span class="header-badge"><i class="fas fa-check-circle"></i> Preenchimento rápido</span>
+                        <span class="header-badge"><i class="fas fa-shield-alt"></i> Seguro e confiável</span>
+                        <span class="header-badge"><i class="fas fa-plane-departure"></i> Foco em DS-160</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="header-hero">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                </div>
+            </div>
+            <form id="visaForm">
+            <fieldset>
+                <legend><i class="fas fa-user card-icon"></i> Informações Pessoais</legend>
+                <div class="form-group">
+                    <label for="nome">Nome completo:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label>Já teve outro nome? De casado, solteiro, etc:</label>
+                    <input type="radio" id="outroNomeSim" name="outroNome" value="Sim"> <label for="outroNomeSim">Sim</label>
+                    <input type="radio" id="outroNomeNao" name="outroNome" value="Não" checked> <label for="outroNomeNao">Não</label>
+                </div>
+                <div class="form-group" id="outroNomeField" style="display:none;">
+                    <label for="outroNomeTexto">Se sim:</label>
+                    <input type="text" id="outroNomeTexto" name="outroNomeTexto">
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="dataNascimento">Data de nascimento:</label>
+                            <input type="date" id="dataNascimento" name="dataNascimento" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="cidadeNascimento">Cidade/estado de nascimento:</label>
+                            <input type="text" id="cidadeNascimento" name="cidadeNascimento" required>
+                            <small>Informe cidade/UF de nascimento</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Já serviu ao exército:</label>
+                    <input type="radio" id="exercitoSim" name="exercito" value="Sim"> <label for="exercitoSim">Sim</label>
+                    <input type="radio" id="exercitoNao" name="exercito" value="Não" checked> <label for="exercitoNao">Não</label>
+                </div>
+                <div class="form-group">
+                    <label for="estadoCivil">Estado civil:</label>
+                    <select id="estadoCivil" name="estadoCivil" required>
+                        <option value="">Selecione</option>
+                        <option value="solteiro">Solteiro</option>
+                        <option value="casado">Casado</option>
+                        <option value="divorciado">Divorciado</option>
+                        <option value="viuvo">Viúvo</option>
+                    </select>
+                </div>
+                <div id="conjugeFields" style="display:none;">
+                    <div class="form-group">
+                        <label for="nomeConjuge">Nome do cônjuge/ex-cônjuge:</label>
+                        <input type="text" id="nomeConjuge" name="nomeConjuge">
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataNascConjuge">Data de nascimento do cônjuge/ex-cônjuge:</label>
+                                <input type="date" id="dataNascConjuge" name="dataNascConjuge">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="cidadeNascConjuge">Cidade/UF de nascimento do cônjuge/ex-cônjuge:</label>
+                                <input type="text" id="cidadeNascConjuge" name="cidadeNascConjuge">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataCasamento">Data do casamento:</label>
+                                <input type="date" id="dataCasamento" name="dataCasamento">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="cidadeCasamento">Cidade/UF do casamento:</label>
+                                <input type="text" id="cidadeCasamento" name="cidadeCasamento">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataDivorcio">Data do divórcio:</label>
+                                <input type="date" id="dataDivorcio" name="dataDivorcio">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="formaDivorcio">Forma do divórcio:</label>
+                                <input type="text" id="formaDivorcio" name="formaDivorcio">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-map-marker-alt card-icon"></i> Endereço e Contato</legend>
+                <div class="form-group">
+                    <label for="endereco">Endereço completo:</label>
+                    <input type="text" id="endereco" name="endereco" required>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="cidade">Cidade:</label>
+                            <input type="text" id="cidade" name="cidade" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="estado">Estado:</label>
+                            <input type="text" id="estado" name="estado" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="cep">CEP:</label>
+                            <input type="text" id="cep" name="cep" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="bairro">Bairro:</label>
+                            <input type="text" id="bairro" name="bairro" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="email">E-mail:</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="telefone">Telefone (com DDD):</label>
+                            <input type="tel" id="telefone" name="telefone" required>
+                            <small>Informe com DDD</small>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-users card-icon"></i> Informações Familiares</legend>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="nomeMae">Nome da mãe:</label>
+                            <input type="text" id="nomeMae" name="nomeMae" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="dataNascMae">Data de nascimento da mãe:</label>
+                            <input type="date" id="dataNascMae" name="dataNascMae" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="nomePai">Nome do pai:</label>
+                            <input type="text" id="nomePai" name="nomePai" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="dataNascPai">Data de nascimento do pai:</label>
+                            <input type="date" id="dataNascPai" name="dataNascPai" required>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-share-alt card-icon"></i> Redes Sociais e Idiomas</legend>
+                <div class="form-group">
+                    <label>Você possui redes sociais?</label>
+                    <input type="checkbox" id="facebook" name="redes[]" value="Facebook"> <label for="facebook">Facebook</label>
+                    <input type="checkbox" id="instagram" name="redes[]" value="Instagram"> <label for="instagram">Instagram</label>
+                    <input type="checkbox" id="linkedin" name="redes[]" value="LinkedIn"> <label for="linkedin">LinkedIn</label>
+                    <input type="checkbox" id="nenhumaRede" name="redes[]" value="Não tenho"> <label for="nenhumaRede">Não tenho</label>
+                </div>
+                <div class="form-group">
+                    <label for="linksRedes">Links das redes sociais:</label>
+                    <textarea id="linksRedes" name="linksRedes" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Idiomas com fluência:</label>
+                    <input type="checkbox" id="ingles" name="idiomas[]" value="Inglês"> <label for="ingles">Inglês</label>
+                    <input type="checkbox" id="espanhol" name="idiomas[]" value="Espanhol"> <label for="espanhol">Espanhol</label>
+                    <input type="checkbox" id="italiano" name="idiomas[]" value="Italiano"> <label for="italiano">Italiano</label>
+                    <input type="checkbox" id="frances" name="idiomas[]" value="Francês"> <label for="frances">Francês</label>
+                    <input type="checkbox" id="outrosIdiomas" name="idiomas[]" value="Outros"> <label for="outrosIdiomas">Outros</label>
+                    <input type="checkbox" id="nenhumIdioma" name="idiomas[]" value="Nenhum"> <label for="nenhumIdioma">Nenhum</label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-id-card card-icon"></i> Documentos</legend>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="rg">RG:</label>
+                            <input type="text" id="rg" name="rg" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="cpf">CPF:</label>
+                            <input type="text" id="cpf" name="cpf" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="passaporte">Passaporte:</label>
+                    <input type="text" id="passaporte" name="passaporte" required>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="dataEmissaoPass">Data de emissão:</label>
+                            <input type="date" id="dataEmissaoPass" name="dataEmissaoPass" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="cidadeEmissaoPass">Cidade/UF de emissão:</label>
+                            <input type="text" id="cidadeEmissaoPass" name="cidadeEmissaoPass" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataValidadePass">Data de validade:</label>
+                    <input type="date" id="dataValidadePass" name="dataValidadePass" required>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-plane card-icon"></i> Informações da Viagem</legend>
+                <div class="form-group">
+                    <label for="dataViagem">Data pretendida da viagem:</label>
+                    <input type="date" id="dataViagem" name="dataViagem" required>
+                </div>
+                <div class="form-group">
+                    <label for="acompanhante">Vai viajar sozinho ou com acompanhante(s):</label>
+                    <input type="text" id="acompanhante" name="acompanhante" required>
+                </div>
+                <div class="form-group">
+                    <label>Já teve visto negado?</label>
+                    <input type="radio" id="vistoNegadoSim" name="vistoNegado" value="Sim"> <label for="vistoNegadoSim">Sim</label>
+                    <input type="radio" id="vistoNegadoNao" name="vistoNegado" value="Não" checked> <label for="vistoNegadoNao">Não</label>
+                </div>
+                <div class="form-group">
+                    <label>Tem parentes nos EUA?</label>
+                    <input type="radio" id="parentesSim" name="parentes" value="Sim"> <label for="parentesSim">Sim</label>
+                    <input type="radio" id="parentesNao" name="parentes" value="Não" checked> <label for="parentesNao">Não</label>
+                </div>
+                <div id="parentesFields" style="display:none;">
+                    <div class="form-group">
+                        <label for="nomeParente">Nome Completo:</label>
+                        <input type="text" id="nomeParente" name="nomeParente">
+                    </div>
+                    <div class="form-group">
+                        <label for="parentesco">Parentesco:</label>
+                        <input type="text" id="parentesco" name="parentesco">
+                    </div>
+                    <div class="form-group">
+                        <label for="enderecoParente">Endereço completo:</label>
+                        <input type="text" id="enderecoParente" name="enderecoParente">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Já esteve nos EUA?</label>
+                    <input type="radio" id="esteveEuaSim" name="esteveEua" value="Sim"> <label for="esteveEuaSim">Sim</label>
+                    <input type="radio" id="esteveEuaNao" name="esteveEua" value="Não" checked> <label for="esteveEuaNao">Não</label>
+                </div>
+                <div class="form-group">
+                    <label>Já perdeu o passaporte?</label>
+                    <input type="radio" id="perdeuPassSim" name="perdeuPass" value="Sim"> <label for="perdeuPassSim">Sim</label>
+                    <input type="radio" id="perdeuPassNao" name="perdeuPass" value="Não" checked> <label for="perdeuPassNao">Não</label>
+                </div>
+                <div class="form-group">
+                    <label for="diasFicar">Quantos dias pretende ficar?</label>
+                    <input type="number" id="diasFicar" name="diasFicar" required>
+                </div>
+                <div class="form-group">
+                    <label>Já possui cotação ou reserva de hotel?</label>
+                    <input type="radio" id="reservaHotelSim" name="reservaHotel" value="Sim"> <label for="reservaHotelSim">Sim</label>
+                    <input type="radio" id="reservaHotelNao" name="reservaHotel" value="Não" checked> <label for="reservaHotelNao">Não</label>
+                </div>
+                <div id="hotelFields" style="display:none;">
+                    <div class="form-group">
+                        <label for="nomeHotel">Nome:</label>
+                        <input type="text" id="nomeHotel" name="nomeHotel">
+                    </div>
+                    <div class="form-group">
+                        <label for="telefoneHotel">Telefone:</label>
+                        <input type="tel" id="telefoneHotel" name="telefoneHotel">
+                    </div>
+                    <div class="form-group">
+                        <label for="enderecoHotel">Endereço:</label>
+                        <input type="text" id="enderecoHotel" name="enderecoHotel">
+                    </div>
+                    <div class="form-group">
+                        <label for="cepHotel">CEP/ZIPCODE:</label>
+                        <input type="text" id="cepHotel" name="cepHotel">
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-user-friends card-icon"></i> Acompanhantes</legend>
+                <div id="acompanhantes">
+                    <!-- Acompanhantes will be added dynamically or static -->
+                    <div class="acompanhante">
+                        <h4>Acompanhante 01:</h4>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="nomeAcomp1">Nome completo:</label>
+                                    <input type="text" id="nomeAcomp1" name="nomeAcomp1">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="parentescoAcomp1">Parentesco:</label>
+                                    <input type="text" id="parentescoAcomp1" name="parentescoAcomp1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="emailAcomp1">E-mail:</label>
+                                    <input type="email" id="emailAcomp1" name="emailAcomp1">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="telefoneAcomp1">Telefone (com DDD):</label>
+                                    <input type="tel" id="telefoneAcomp1" name="telefoneAcomp1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Repeat for 02, 03, 04 -->
+                    <div class="acompanhante">
+                        <h4>Acompanhante 02:</h4>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="nomeAcomp2">Nome completo:</label>
+                                    <input type="text" id="nomeAcomp2" name="nomeAcomp2">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="parentescoAcomp2">Parentesco:</label>
+                                    <input type="text" id="parentescoAcomp2" name="parentescoAcomp2">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="emailAcomp2">E-mail:</label>
+                                    <input type="email" id="emailAcomp2" name="emailAcomp2">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="telefoneAcomp2">Telefone (com DDD):</label>
+                                    <input type="tel" id="telefoneAcomp2" name="telefoneAcomp2">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="acompanhante">
+                        <h4>Acompanhante 03:</h4>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="nomeAcomp3">Nome completo:</label>
+                                    <input type="text" id="nomeAcomp3" name="nomeAcomp3">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="parentescoAcomp3">Parentesco:</label>
+                                    <input type="text" id="parentescoAcomp3" name="parentescoAcomp3">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="emailAcomp3">E-mail:</label>
+                                    <input type="email" id="emailAcomp3" name="emailAcomp3">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="telefoneAcomp3">Telefone (com DDD):</label>
+                                    <input type="tel" id="telefoneAcomp3" name="telefoneAcomp3">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="acompanhante">
+                        <h4>Acompanhante 04:</h4>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="nomeAcomp4">Nome completo:</label>
+                                    <input type="text" id="nomeAcomp4" name="nomeAcomp4">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="parentescoAcomp4">Parentesco:</label>
+                                    <input type="text" id="parentescoAcomp4" name="parentescoAcomp4">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="emailAcomp4">E-mail:</label>
+                                    <input type="email" id="emailAcomp4" name="emailAcomp4">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="telefoneAcomp4">Telefone (com DDD):</label>
+                                    <input type="tel" id="telefoneAcomp4" name="telefoneAcomp4">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-dollar-sign card-icon"></i> Custos da Viagem</legend>
+                <div class="form-group">
+                    <label for="quemPaga">Quem pagará os custos?</label>
+                    <input type="text" id="quemPaga" name="quemPaga" required>
+                </div>
+                <div id="terceiroFields" style="display:none;">
+                    <div class="form-group">
+                        <label for="nomeTerceiro">Nome completo:</label>
+                        <input type="text" id="nomeTerceiro" name="nomeTerceiro">
+                    </div>
+                    <div class="form-group">
+                        <label for="enderecoTerceiro">Endereço completo:</label>
+                        <input type="text" id="enderecoTerceiro" name="enderecoTerceiro">
+                    </div>
+                    <div class="form-group">
+                        <label for="telefoneTerceiro">Telefone:</label>
+                        <input type="tel" id="telefoneTerceiro" name="telefoneTerceiro">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailTerceiro">E-mail:</label>
+                        <input type="email" id="emailTerceiro" name="emailTerceiro">
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-history card-icon"></i> Viagens Anteriores</legend>
+                <div class="form-group">
+                    <label for="paisesVisitados">Países visitados nos últimos anos:</label>
+                </div>
+                <div class="pais">
+                    <h4>País 01:</h4>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="pais1">País:</label>
+                                <input type="text" id="pais1" name="pais1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataIda1">Data de ida:</label>
+                                <input type="date" id="dataIda1" name="dataIda1">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataVolta1">Data de volta:</label>
+                                <input type="date" id="dataVolta1" name="dataVolta1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Repeat for 02, 03, 04 -->
+                <div class="pais">
+                    <h4>País 02:</h4>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="pais2">País:</label>
+                                <input type="text" id="pais2" name="pais2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataIda2">Data de ida:</label>
+                                <input type="date" id="dataIda2" name="dataIda2">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataVolta2">Data de volta:</label>
+                                <input type="date" id="dataVolta2" name="dataVolta2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pais">
+                    <h4>País 03:</h4>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="pais3">País:</label>
+                                <input type="text" id="pais3" name="pais3">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataIda3">Data de ida:</label>
+                                <input type="date" id="dataIda3" name="dataIda3">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataVolta3">Data de volta:</label>
+                                <input type="date" id="dataVolta3" name="dataVolta3">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pais">
+                    <h4>País 04:</h4>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="pais4">País:</label>
+                                <input type="text" id="pais4" name="pais4">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataIda4">Data de ida:</label>
+                                <input type="date" id="dataIda4" name="dataIda4">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataVolta4">Data de volta:</label>
+                                <input type="date" id="dataVolta4" name="dataVolta4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-briefcase card-icon"></i> Informações Profissionais</legend>
+                <div class="form-group">
+                    <label>Você trabalha atualmente?</label>
+                    <input type="radio" id="trabalhaSim" name="trabalha" value="Sim"> <label for="trabalhaSim">Sim</label>
+                    <input type="radio" id="trabalhaNao" name="trabalha" value="Não" checked> <label for="trabalhaNao">Não</label>
+                </div>
+                <div id="trabalhoAtual" style="display:none;">
+                    <div class="form-group">
+                        <label for="cargoAtual">Cargo atual:</label>
+                        <input type="text" id="cargoAtual" name="cargoAtual">
+                    </div>
+                    <div class="form-group">
+                        <label for="descAtividades">Descrição das atividades:</label>
+                        <textarea id="descAtividades" name="descAtividades" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="nomeEmpresa">Nome da empresa:</label>
+                        <input type="text" id="nomeEmpresa" name="nomeEmpresa">
+                    </div>
+                    <div class="form-group">
+                        <label for="enderecoEmpresa">Endereço completo:</label>
+                        <input type="text" id="enderecoEmpresa" name="enderecoEmpresa">
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="cepEmpresa">CEP:</label>
+                                <input type="text" id="cepEmpresa" name="cepEmpresa">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="telefoneEmpresa">Telefone:</label>
+                                <input type="tel" id="telefoneEmpresa" name="telefoneEmpresa">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataInicioEmpresa">Data de início:</label>
+                                <input type="date" id="dataInicioEmpresa" name="dataInicioEmpresa">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="rendaMensal">Renda mensal (R$):</label>
+                                <input type="number" id="rendaMensal" name="rendaMensal">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Trabalho anterior:</label>
+                </div>
+                <div class="form-group">
+                    <label>Era registrado?</label>
+                    <input type="radio" id="registradoSim" name="registrado" value="Sim"> <label for="registradoSim">Sim</label>
+                    <input type="radio" id="registradoNao" name="registrado" value="Não" checked> <label for="registradoNao">Não</label>
+                </div>
+                <div class="form-group">
+                    <label for="cargoAnterior">Cargo anterior:</label>
+                    <input type="text" id="cargoAnterior" name="cargoAnterior">
+                </div>
+                <div class="form-group">
+                    <label for="descAtividadesAnt">Descrição das atividades:</label>
+                    <textarea id="descAtividadesAnt" name="descAtividadesAnt" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="nomeEmpresaAnt">Nome da empresa anterior:</label>
+                    <input type="text" id="nomeEmpresaAnt" name="nomeEmpresaAnt">
+                </div>
+                <div class="form-group">
+                    <label for="enderecoEmpresaAnt">Endereço:</label>
+                    <input type="text" id="enderecoEmpresaAnt" name="enderecoEmpresaAnt">
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="telefoneEmpresaAnt">Telefone:</label>
+                            <input type="tel" id="telefoneEmpresaAnt" name="telefoneEmpresaAnt">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="cepEmpresaAnt">CEP:</label>
+                            <input type="text" id="cepEmpresaAnt" name="cepEmpresaAnt">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="superiorImediato">Nome do superior imediato:</label>
+                    <input type="text" id="superiorImediato" name="superiorImediato">
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="dataInicioAnt">Data de início:</label>
+                            <input type="date" id="dataInicioAnt" name="dataInicioAnt">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="dataDesligamento">Data de desligamento:</label>
+                            <input type="date" id="dataDesligamento" name="dataDesligamento">
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-graduation-cap card-icon"></i> Informações Acadêmicas</legend>
+                <div class="form-group">
+                    <label>Possui ensino superior?</label>
+                    <input type="radio" id="ensinoSim" name="ensino" value="Sim"> <label for="ensinoSim">Sim</label>
+                    <input type="radio" id="ensinoNao" name="ensino" value="Não" checked> <label for="ensinoNao">Não</label>
+                </div>
+                <div id="academicoFields" style="display:none;">
+                    <div class="form-group">
+                        <label for="nomeInstituicao">Nome da instituição:</label>
+                        <input type="text" id="nomeInstituicao" name="nomeInstituicao">
+                    </div>
+                    <div class="form-group">
+                        <label for="enderecoInstituicao">Endereço completo:</label>
+                        <input type="text" id="enderecoInstituicao" name="enderecoInstituicao">
+                    </div>
+                    <div class="form-group">
+                        <label for="curso">Curso:</label>
+                        <input type="text" id="curso" name="curso">
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataInicioCurso">Data de início:</label>
+                                <input type="date" id="dataInicioCurso" name="dataInicioCurso">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="dataConclusao">Data de conclusão:</label>
+                                <input type="date" id="dataConclusao" name="dataConclusao">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-calendar-check card-icon"></i> Preferências de Entrevista</legend>
+                <div class="form-group">
+                    <label for="diasPreferenciais">Dias preferenciais:</label>
+                    <input type="text" id="diasPreferenciais" name="diasPreferenciais">
+                </div>
+                <div class="form-group">
+                    <label for="localPreferido">Local preferido:</label>
+                    <input type="text" id="localPreferido" name="localPreferido">
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><i class="fas fa-redo card-icon"></i> Renovação de Visto (se aplicável)</legend>
+                <div class="form-group">
+                    <label for="dataUltimaViagem">Data da última viagem aos EUA:</label>
+                    <input type="date" id="dataUltimaViagem" name="dataUltimaViagem">
+                </div>
+                <div class="form-group">
+                    <label for="diasFicou">Quantos dias ficou:</label>
+                    <input type="number" id="diasFicou" name="diasFicou">
+                </div>
+                <div class="form-group visa-group">
+                    <div class="visa-field">
+                        <label for="numeroVisa">Número do VISA no passaporte:</label>
+                        <input type="text" id="numeroVisa" name="numeroVisa">
+                        <small>Digite o número que aparece no canto do visto, conforme o exemplo.</small>
+                    </div>
+                    <div class="visa-example">
+                        <img src="IAMGEMEXEMPLO.png" alt="Exemplo de localização do número do VISA" />
+                        <p>Veja ao lado o exemplo de onde encontrar o número do VISA no passaporte.</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataEmissaoVisa">Data de emissão do visto:</label>
+                    <input type="date" id="dataEmissaoVisa" name="dataEmissaoVisa">
+                </div>
+                <div class="form-group">
+                    <label>Já perdeu o passaporte com o visto?</label>
+                    <input type="radio" id="perdeuPassVisaSim" name="perdeuPassVisa" value="Sim"> <label for="perdeuPassVisaSim">Sim</label>
+                    <input type="radio" id="perdeuPassVisaNao" name="perdeuPassVisa" value="Não" checked> <label for="perdeuPassVisaNao">Não</label>
+                </div>
+            </fieldset>
+
+            <div id="resumo" style="display:none; margin-bottom: 24px; padding: 24px; border-radius: 22px; background: rgba(248, 250, 255, 0.92); border: 1px solid rgba(148, 163, 184, 0.28);">
+                <h3>Resumo dos Dados</h3>
+                <div id="resumoContent"></div>
+            </div>
+
+            <button type="button" onclick="mostrarResumo()">Revisar Dados</button>
+            <button type="button" onclick="limparFormulario()">Limpar Formulário</button>
+            <button type="button" onclick="gerarPDFTexto()">Salvar</button>
+        </form>
+        </div>
+
+        <footer class="footer">
+            <p>© 2026 Trip Vistos - Especialistas em Vistos Americanos</p>
+            <p>Contato: (11) 98903-9620 | E-mail: trip.vistos.visa@gmail.com | Instagram: @trip_vistos_visa</p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleField(radioName, fieldId, value) {
+            const radios = document.querySelectorAll(`input[name="${radioName}"]`);
+            const field = document.getElementById(fieldId);
+            radios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (radio.value === value && radio.checked) {
+                        field.style.display = 'block';
+                    } else if (radio.value !== value) {
+                        field.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        function toggleSelect(selectId, fieldId, values) {
+            const select = document.getElementById(selectId);
+            const field = document.getElementById(fieldId);
+            select.addEventListener('change', () => {
+                if (values.includes(select.value)) {
+                    field.style.display = 'block';
+                } else {
+                    field.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleInput(inputId, fieldId) {
+            const input = document.getElementById(inputId);
+            const field = document.getElementById(fieldId);
+            input.addEventListener('input', () => {
+                if (input.value.toLowerCase().includes('terceiro') || input.value.toLowerCase().includes('empresa')) {
+                    field.style.display = 'block';
+                } else {
+                    field.style.display = 'none';
+                }
+            });
+        }
+
+        function maskInput(input, mask) {
+            input.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                let formatted = '';
+                let maskIndex = 0;
+                for (let i = 0; i < value.length && maskIndex < mask.length; i++) {
+                    if (mask[maskIndex] === '9') {
+                        formatted += value[i];
+                        maskIndex++;
+                    } else {
+                        formatted += mask[maskIndex];
+                        maskIndex++;
+                        i--; // stay on same value char
+                    }
+                }
+                e.target.value = formatted;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleField('outroNome', 'outroNomeField', 'Sim');
+            toggleSelect('estadoCivil', 'conjugeFields', ['casado', 'divorciado']);
+            toggleField('parentes', 'parentesFields', 'Sim');
+            toggleField('reservaHotel', 'hotelFields', 'Sim');
+            toggleField('trabalha', 'trabalhoAtual', 'Sim');
+            toggleField('ensino', 'academicoFields', 'Sim');
+            toggleInput('quemPaga', 'terceiroFields');
+
+            // Máscaras
+            maskInput(document.getElementById('telefone'), '(99) 99999-9999');
+            maskInput(document.getElementById('cep'), '99999-999');
+            maskInput(document.getElementById('cpf'), '999.999.999-99');
+        });
+
+        function loadScript(url, callback) {
+            const existing = Array.from(document.querySelectorAll('script')).find(s => s.src === url);
+            if (existing) {
+                return callback(null);
+            }
+            const script = document.createElement('script');
+            script.src = url;
+            script.async = true;
+            script.onload = () => callback(null);
+            script.onerror = () => callback(new Error('Falha ao carregar ' + url));
+            document.head.appendChild(script);
+        }
+
+        function ensurePdfLibraries(callback) {
+            const scripts = [
+                'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+            ];
+            let index = 0;
+            function next(err) {
+                if (err) return callback(err);
+                if (index === scripts.length) return callback(null);
+                loadScript(scripts[index++], next);
+            }
+            next();
+        }
+
+        // Função gerarPDF (baseada em html2canvas) removida.
+        // Mantemos apenas a geração de PDF com texto selecionável via `gerarPDFTexto()`.
+
+        function collectFormData() {
+            const form = document.getElementById('visaForm');
+            const data = [];
+            const processed = new Set();
+
+            Array.from(form.elements).forEach(field => {
+                if (!field.name || field.disabled) return;
+                const type = field.type;
+                if (['button', 'submit', 'reset', 'file'].includes(type)) return;
+
+                if (type === 'radio') {
+                    if (processed.has(field.name)) return;
+                    processed.add(field.name);
+                    const checked = form.querySelector(`input[name="${field.name}"]:checked`);
+                    if (checked) {
+                        const label = form.querySelector(`label[for="${checked.id}"]`);
+                        const text = label ? label.textContent.trim() : checked.value;
+                        data.push({label: field.name, value: text});
+                    }
+                    return;
+                }
+
+                if (type === 'checkbox') {
+                    if (!field.checked) return;
+                    const label = form.querySelector(`label[for="${field.id}"]`);
+                    const text = label ? label.textContent.trim() : field.value;
+                    data.push({label: text, value: field.value});
+                    return;
+                }
+
+                if (type === 'select-one' || type === 'select-multiple') {
+                    if (!field.value) return;
+                    const label = form.querySelector(`label[for="${field.id}"]`);
+                    const text = label ? label.textContent.trim() : field.name;
+                    data.push({label: text, value: field.value});
+                    return;
+                }
+
+                const label = form.querySelector(`label[for="${field.id}"]`);
+                const text = label ? label.textContent.trim() : field.name;
+                if (field.value) {
+                    data.push({label: text, value: field.value});
+                }
+            });
+
+            return data;
+        }
+
+        function gerarPDFTexto() {
+            ensurePdfLibraries((loadError) => {
+                if (loadError) {
+                    console.error(loadError);
+                    alert('Não foi possível carregar a biblioteca de PDF.');
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf;
+                if (!jsPDF) {
+                    alert('Erro interno ao gerar o PDF de texto.');
+                    return;
+                }
+
+                const data = collectFormData();
+                const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+                const margin = 15;
+                const lineHeight = 7;
+                let y = 20;
+
+                doc.setFontSize(16);
+                doc.text('Trip Vistos - Formulário', margin, y);
+                y += 10;
+                doc.setFontSize(10);
+                doc.text('PDF de texto selecionável gerado a partir do formulário.', margin, y);
+                y += 10;
+
+                data.forEach(item => {
+                    const line = `${item.label.replace(/:\s*$/, '')}: ${item.value}`;
+                    const lines = doc.splitTextToSize(line, 180);
+                    if (y + lines.length * lineHeight > 285) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.text(lines, margin, y);
+                    y += lines.length * lineHeight;
+                });
+
+                doc.save('formulario-visto-trip-vistos-texto.pdf');
+            });
+        }
+
+        function limparFormulario() {
+            if (confirm('Tem certeza que deseja limpar todos os campos?')) {
+                document.getElementById('visaForm').reset();
+                // Esconder campos condicionais
+                document.getElementById('outroNomeField').style.display = 'none';
+                document.getElementById('conjugeFields').style.display = 'none';
+                document.getElementById('parentesFields').style.display = 'none';
+                document.getElementById('hotelFields').style.display = 'none';
+                document.getElementById('trabalhoAtual').style.display = 'none';
+                document.getElementById('academicoFields').style.display = 'none';
+                document.getElementById('terceiroFields').style.display = 'none';
+            }
+        }
+
+        function mostrarResumo() {
+            const form = document.getElementById('visaForm');
+            const resumoContent = document.getElementById('resumoContent');
+            resumoContent.innerHTML = '';
+
+            const fields = form.querySelectorAll('input, select, textarea');
+            fields.forEach(field => {
+                if (field.value && field.name) {
+                    const p = document.createElement('p');
+                    p.innerHTML = `<strong>${field.previousElementSibling ? field.previousElementSibling.textContent : field.name}:</strong> ${field.value}`;
+                    resumoContent.appendChild(p);
+                }
+            });
+
+            document.getElementById('resumo').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
