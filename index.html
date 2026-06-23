@@ -1156,6 +1156,7 @@
             <button type="button" onclick="mostrarResumo()">Revisar Dados</button>
             <button type="button" onclick="limparFormulario()">Limpar Formulário</button>
             <button type="button" onclick="gerarPDFTexto()">Salvar</button>
+            <button type="button" id="enviarBtn" onclick="enviarFormulario()">Enviar</button>
         </form>
         </div>
 
@@ -1355,6 +1356,44 @@
 
                 doc.save('formulario-visto-trip-vistos-texto.pdf');
             });
+        }
+
+        async function enviarFormulario() {
+            const endpoint = 'https://formspree.io/f/mjgqkpov'; // endpoint fornecido pelo usuário
+            const form = document.getElementById('visaForm');
+            const formData = new FormData(form);
+            formData.append('source', window.location.href);
+
+            const btn = document.getElementById('enviarBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Enviando...';
+            }
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (res.ok) {
+                    alert('Formulário enviado com sucesso. Você receberá confirmação por e-mail.');
+                    form.reset();
+                } else {
+                    const data = await res.json().catch(() => null);
+                    console.error('Erro envio:', data || res.statusText);
+                    alert('Erro ao enviar formulário. Verifique o endpoint ou tente novamente.');
+                }
+            } catch (err) {
+                console.error('Falha ao enviar:', err);
+                alert('Falha de rede ao enviar o formulário. Tente novamente.');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Enviar';
+                }
+            }
         }
 
         function limparFormulario() {
